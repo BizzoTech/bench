@@ -18,8 +18,18 @@ from bench import patches
 @click.option('--no-backup',is_flag=True)
 @click.option('--force',is_flag=True)
 @click.option('--reset', is_flag=True, help="Hard resets git branch's to their new states overriding any changes and overriding rebase on pull")
-def update(pull=False, patch=False, build=False, bench=False, auto=False, restart_supervisor=False, requirements=False, no_backup=False, force=False, reset=False):
+@click.option('--no-git', is_flag=True, help="Don't pull anything from git - to be used inside docker env")
+def update(pull=False, patch=False, build=False, bench=False, auto=False, restart_supervisor=False, requirements=False, no_backup=False, force=False, reset=False, no_git=False):
 	"Update bench"
+	
+	if no_git:
+		bench_path = '.'
+		print('Backing up sites...')
+		backup_all_sites(bench_path=bench_path)
+		print('Patching sites...')
+		patch_sites(bench_path=bench_path)
+		build_assets(bench_path=bench_path)
+		return
 
 	if not (pull or patch or build or bench or requirements):
 		pull, patch, build, bench, requirements = True, True, True, True, True
